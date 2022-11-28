@@ -10,10 +10,10 @@ from datetime import timedelta
 
 # Local Package
 from db.connection import conn
-from models.vendedor import vendedores
-from schemas.vendedor import Vendedor
+from models.usuario import usuario
+from schemas.usuario import Usuario
 from schemas.token import TokenData
-from modules.auth import auth_user
+from modules.auth import auth_user, hash_password
 from modules.token import SECRET_KEY, ALGORITHM, ACCES_TOKEN_EXPIRE_MINUTES
 from modules.token import create_access_token
 
@@ -25,11 +25,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def get_user(email: str):
     user = conn.execute(
-        vendedores.select().where(vendedores.c.email_vendedor == email)
+        usuario.select().where(usuario.c.email_usuario == email)
     ).first()
     if user:
         user_dict = user
-    return Vendedor(**user_dict)
+    return Usuario(**user_dict)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -51,9 +51,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
-
 # Paths
-
 
 @app.post("/token")
 async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -66,7 +64,7 @@ async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
         )
     acces_token_expires = timedelta(minutes=ACCES_TOKEN_EXPIRE_MINUTES)
     acces_token = create_access_token(
-        data={"sub": user.email_vendedor}, expires_delta=acces_token_expires
+        data={"sub": user.email_usuario}, expires_delta=acces_token_expires
     )
     print(acces_token)
     return {"access_token": acces_token, "token_type": "bearer"}
@@ -83,7 +81,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
     acces_token_expires = timedelta(minutes=ACCES_TOKEN_EXPIRE_MINUTES)
     acces_token = create_access_token(
-        data={"sub": user.email_vendedor}, expires_delta=acces_token_expires
+        data={"sub": user.email_usuario}, expires_delta=acces_token_expires
     )
     print(acces_token)
     return {"access_token": acces_token, "token_type": "bearer"}
@@ -93,7 +91,7 @@ async def posting(info: str):
   new_info = f'{info} con algo nuevo'
   return new_info
 
-@app.get("/vendedor/me", response_model=Vendedor)
-async def vendedor_info(current_user: Vendedor = Depends(get_current_user)):
+@app.get("/usuario/me", response_model=Usuario)
+async def usuario_info(current_user: Usuario = Depends(get_current_user)):
     print(current_user.dict(exclude={"password"}))
     return current_user.dict(exclude={"password"})

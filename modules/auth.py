@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from db.connection import conn
-from models.vendedor import vendedores
+from models.usuario import usuario
 
 pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 
@@ -15,7 +15,7 @@ def verify_password(login_password: str, hashed_password: str):
 
 def auth_user(username: str, password: str):
     user = conn.execute(
-        vendedores.select().where(vendedores.c.email_vendedor == username)
+        usuario.select().where(usuario.c.email_usuario == username)
     ).first()
     if not user:
         return False
