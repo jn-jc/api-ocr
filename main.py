@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # others
 from datetime import timedelta
-import cv2
 from os import getcwd
 
 # Local Package
@@ -14,7 +13,7 @@ from schemas.usuario import Usuario
 from modules.auth import auth_user
 from modules.token import ACCES_TOKEN_EXPIRE_MINUTES
 from modules.token import create_access_token, get_current_user
-from modules.ocr import read_image, validate_folder
+from modules.image import send_image
 
 app = FastAPI(
     title="API OCR-app Cruz Verde Colombia",
@@ -56,16 +55,17 @@ async def usuario_info(current_user: Usuario = Depends(get_current_user)):
 
 # dependencies=[Depends(get_current_user)]
 @app.post("/image/send", tags=["Images"], status_code=status.HTTP_202_ACCEPTED)
-def send_image(image: UploadFile = File(...)):
+async def upload_image(image: UploadFile = File(...)):
     if image.content_type != "image/jpeg":
-        return {"error": "El archivo enviado no es una imagen."}
-    with open(getcwd() + "/assets/" + image.filename, "wb") as file:
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="El tipo de archivo debe ser una imagen/jpg",
+        )
+    with open(getcwd() + "/temp/" + image.filename, "wb") as file:
         content = image.file.read()
         file.write(content)
         file.close()
-    #validate_folder()
-    return {
-        "Filename": image.filename,
-        "Format": image.content_type,
-    }
-
+    message = await send_image()
+    if message:
+      return {'message': 'El archivo se envio correctamente'}
+    return {'message': 'El archivo no se envio con exito, por favor vuelva a intentarlo'}
