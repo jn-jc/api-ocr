@@ -1,7 +1,7 @@
 # fastAPI
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Body, UploadFile, File
+from fastapi import Body, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 # others
@@ -55,7 +55,7 @@ async def usuario_info(current_user: Usuario = Depends(get_current_user)):
 
 # dependencies=[Depends(get_current_user)]
 @app.post("/image/send", tags=["Images"], status_code=status.HTTP_202_ACCEPTED)
-async def upload_image(image: UploadFile = File(...)):
+async def upload_image(image: UploadFile = File(...), id_vendedor: str = Query(...)):
     if image.content_type != "image/jpeg":
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
@@ -65,7 +65,7 @@ async def upload_image(image: UploadFile = File(...)):
         content = image.file.read()
         file.write(content)
         file.close()
-    message = await send_image()
+    message = await send_image(id_vendedor)
     if message:
       return {'message': 'El archivo se envio correctamente'}
     return {'message': 'El archivo no se envio con exito, por favor vuelva a intentarlo'}

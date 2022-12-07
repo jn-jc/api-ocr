@@ -1,5 +1,6 @@
 from os import getcwd, listdir, remove
-from requests import post, HTTPError
+from requests import post, exceptions
+from datetime import datetime
 
 url_api = 'http://localhost:9000/api/images'
 path = f'{getcwd()}/temp'
@@ -11,15 +12,17 @@ async def validate_dir():
     return False
   return dir_path
 
-async def send_image():
+async def send_image(id_vendedor):
   validate = await validate_dir()
   last_image = ''
+  date_now = datetime.now()
+  date_str = date_now.strftime("%d_%m_%Y_%H_%M")
   if(validate):
     last_image = f'{path}/{validate[0]}'
     try:
-      file = {'image': open(last_image, 'rb')}
+      file = {'image': (f'{id_vendedor}-{date_str}.jpg',open(last_image, 'rb'))}
       response = post(url=f'{url_api}/get-image', files=file)
       remove(last_image)
       return response
-    except HTTPError:
-      raise HTTPError
+    except exceptions.ConnectionError as errc:
+      print({'Error Connection' : errc})
