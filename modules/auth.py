@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from db.connection import conn
+from config.db import conn
 from models.usuario import usuario
 
 pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")

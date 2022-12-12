@@ -16,7 +16,7 @@ async def send_image(id_vendedor):
   validate = await validate_dir()
   last_image = ''
   date_now = datetime.now()
-  date_str = date_now.strftime("%d_%m_%Y_%H_%M")
+  date_str = date_now.strftime("%d_%m_%Y_%H_%M_%S")
   if(validate):
     last_image = f'{path}/{validate[0]}'
     try:

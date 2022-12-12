@@ -53,9 +53,8 @@ async def usuario_info(current_user: Usuario = Depends(get_current_user)):
     return current_user
 
 
-# dependencies=[Depends(get_current_user)]
 @app.post("/image/send", tags=["Images"], status_code=status.HTTP_202_ACCEPTED)
-async def upload_image(image: UploadFile = File(...), id_vendedor: str = Query(...)):
+async def upload_image(image: UploadFile = File(...), current_user: Usuario = Depends(get_current_user)):
     if image.content_type != "image/jpeg":
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
@@ -65,7 +64,9 @@ async def upload_image(image: UploadFile = File(...), id_vendedor: str = Query(.
         content = image.file.read()
         file.write(content)
         file.close()
-    message = await send_image(id_vendedor)
+    usuario = current_user.dict()
+    id_usuario = usuario['id_usuario']
+    message = await send_image(id_usuario)
     if message:
       return {'message': 'El archivo se envio correctamente'}
     return {'message': 'El archivo no se envio con exito, por favor vuelva a intentarlo'}

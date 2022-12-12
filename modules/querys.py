@@ -1,4 +1,4 @@
-from db.connection import conn
+from config.db import conn
 from models.usuario import usuario
 from schemas.usuario import Usuario
 

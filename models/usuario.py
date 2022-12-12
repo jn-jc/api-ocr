@@ -1,6 +1,6 @@
 from sqlalchemy import Table, Column
 from sqlalchemy.sql.sqltypes import Integer, String
-from db.connection import meta
+from config.db import meta
 
 usuario = Table("usuarios", meta, 
                  Column("id_usuario", Integer, primary_key=True),
