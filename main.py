@@ -38,7 +38,7 @@ async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Correo o contrasña incorrectos",
+            detail="Correo o contraseña incorrectos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     acces_token_expires = timedelta(minutes=ACCES_TOKEN_EXPIRE_MINUTES)

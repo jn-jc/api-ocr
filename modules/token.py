@@ -10,7 +10,7 @@ from modules.querys import get_user
 
 SECRET_KEY = "d20c9a83f171d311899476531e16d1767d8e9b7c0bbccd6bb05727ef352a064e"
 ALGORITHM = "HS256"
-ACCES_TOKEN_EXPIRE_MINUTES = 8
+ACCES_TOKEN_EXPIRE_MINUTES = 25
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
   to_encode = data.copy()
