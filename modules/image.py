@@ -22,7 +22,7 @@ async def send_image(id_vendedor):
     try:
       file = {'image': (f'{id_vendedor}-{date_str}.jpg',open(last_image, 'rb'))}
       response = post(url=f'{url_api}/get-image', files=file)
-      remove(last_image)
+      #remove(last_image)
       return response
     except exceptions.ConnectionError as errc:
       print({'Error Connection' : errc})

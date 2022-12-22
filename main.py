@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # others
 from datetime import timedelta
 from os import getcwd
+import base64
 
 # Local Package
 from schemas.usuario import Usuario
@@ -52,21 +53,18 @@ async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
 async def usuario_info(current_user: Usuario = Depends(get_current_user)):
     return current_user
 
-
 @app.post("/image/send", tags=["Images"], status_code=status.HTTP_202_ACCEPTED)
-async def upload_image(image: UploadFile = File(...), current_user: Usuario = Depends(get_current_user)):
-    if image.content_type != "image/jpeg":
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="El tipo de archivo debe ser una imagen/jpg",
-        )
-    with open(getcwd() + "/temp/" + image.filename, "wb") as file:
-        content = image.file.read()
-        file.write(content)
-        file.close()
+async def upload_image_str(
+    image: str = Body(...), current_user: Usuario = Depends(get_current_user)
+):
     usuario = current_user.dict()
-    id_usuario = usuario['id_usuario']
+    id_usuario = usuario["id_usuario"]
+    image_decode = base64.b64decode(image)
+    with (open(getcwd() + "/temp/" + "imagen_decode.jpg", "wb")) as file:
+        file.write(image_decode)
     message = await send_image(id_usuario)
     if message:
-      return {'message': 'El archivo se envio correctamente'}
-    return {'message': 'El archivo no se envio con exito, por favor vuelva a intentarlo'}
+        return {"message": "El archivo se envio correctamente"}
+    return {
+        "message": "El archivo no se envio con exito, por favor vuelva a intentarlo"
+    }
